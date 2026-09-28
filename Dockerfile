@@ -1,0 +1,12 @@
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /opt/app
+COPY --from=build /app/target/*.jar /opt/app/app.jar
+RUN ls -la /opt/app
+EXPOSE 8080
+ENTRYPOINT ["sh", "-c", "ls -la /opt/app; java -jar /opt/app/app.jar"]
