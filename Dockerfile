@@ -3,10 +3,11 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
+RUN ls -la /app/target
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /opt/app
-COPY --from=build /app/target/*.jar /opt/app/app.jar
-RUN ls -la /opt/app
+COPY --from=build /app/target/*.jar /opt/app/
+RUN ls -la /opt/app && test -n "$(ls /opt/app/*.jar)"
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "ls -la /opt/app; java -jar /opt/app/app.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar /opt/app/*.jar"]
