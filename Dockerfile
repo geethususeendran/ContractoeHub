@@ -5,9 +5,8 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 RUN ls -la /app/target
 
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /opt/app
-COPY --from=build /app/target/*.jar /opt/app/
-RUN ls -la /opt/app && test -n "$(ls /opt/app/*.jar)"
+FROM tomcat:10.1-jre17
+RUN rm -rf /usr/local/tomcat/webapps/*
+COPY --from=build /app/target/app.war /usr/local/tomcat/webapps/ROOT.war
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "java -jar /opt/app/*.jar"]
+CMD ["catalina.sh", "run"]
